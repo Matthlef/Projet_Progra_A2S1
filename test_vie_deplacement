@@ -6,13 +6,15 @@ Artwork from https://kenney.nl
 If Python and Arcade are installed, this example can be run from the command line with:
 python -m arcade.examples.sprite_rooms
 """
-
+import random
 import arcade
 import os
 
-SPRITE_SCALING = 0.5
+SPRITE_SCALING_PLAYER = 0.5
+SPRITE_SCALING_COIN = 0.2
+COIN_COUNT = 10
 SPRITE_NATIVE_SIZE = 128
-SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
+SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING_PLAYER)
 
 SCREEN_WIDTH = SPRITE_SIZE * 14
 SCREEN_HEIGHT = SPRITE_SIZE * 10
@@ -20,6 +22,31 @@ SCREEN_TITLE = "Sprite Rooms Example"
 
 MOVEMENT_SPEED = 20
 
+class Coin(arcade.Sprite):
+    """
+    This class represents the coins on our screen. It is a child class of
+    the arcade library's "Sprite" class.
+    """
+
+    def follow_sprite(self, player_sprite):
+        """
+        This function will move the current sprite towards whatever
+        other sprite is specified as a parameter.
+
+        We use the 'min' function here to get the sprite to line up with
+        the target sprite, and not jump around if the sprite is not off
+        an exact multiple of SPRITE_SPEED.
+        """
+
+        if self.center_y < player_sprite.center_y:
+            self.center_y += min(MOVEMENT_SPEED, player_sprite.center_y - self.center_y)
+        elif self.center_y > player_sprite.center_y:
+            self.center_y -= min(MOVEMENT_SPEED, self.center_y - player_sprite.center_y)
+
+        if self.center_x < player_sprite.center_x:
+            self.center_x += min(MOVEMENT_SPEED, player_sprite.center_x - self.center_x)
+        elif self.center_x > player_sprite.center_x:
+            self.center_x -= min(MOVEMENT_SPEED, self.center_x - player_sprite.center_x)
 
 class Room:
     """
@@ -53,7 +80,7 @@ def setup_room_1():
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING_PLAYER)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
@@ -64,13 +91,13 @@ def setup_room_1():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             # Skip making a block 4 and 5 blocks up on the right side
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x == 0:
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING_PLAYER)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
 
     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png",
-                         SPRITE_SCALING)
+                         SPRITE_SCALING_PLAYER)
     wall.left = 7 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
@@ -104,18 +131,21 @@ class MyGame(arcade.Window):
         # Set up the player
         self.rooms = None
         self.player_sprite = None
+        self.mob_list = None
         self.player_list = None
         self.physics_engine = None
+        self.score = 0
 
     def setup(self):
         """ Set up the game and initialize the variables. """
         # Set up the player
         self.player_sprite = arcade.Sprite(":resources:images/animated_characters/female_person/"
-                                           "femalePerson_idle.png", SPRITE_SCALING)
+                                           "femalePerson_idle.png", SPRITE_SCALING_PLAYER)
         self.player_sprite.center_x = 100
         self.player_sprite.center_y = 100
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player_sprite)
+        self.mob_list = arcade.SpriteList()
 
         # Our list of rooms
         self.rooms = []
@@ -130,6 +160,20 @@ class MyGame(arcade.Window):
         # Create a physics engine for this room
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
+        for i in range(COIN_COUNT):
+            # Create the coin instance
+            # Coin image from kenney.nl
+            coin = Coin(":resources:images/items/coinGold.png", SPRITE_SCALING_COIN)
+
+            # Position the coin
+            coin.center_x = random.randrange(SCREEN_WIDTH)
+            coin.center_y = random.randrange(SCREEN_HEIGHT)
+
+            # Add the coin to the lists
+            self.coin_list.append(coin)
+
+
+
     def on_draw(self):
         """
         Render the screen.
@@ -137,7 +181,7 @@ class MyGame(arcade.Window):
 
         # This command has to happen before we start drawing
         self.clear()
-
+        self.coin_list.draw()
         # Draw the background texture
         arcade.draw_lrwh_rectangle_textured(0, 0,
                                             SCREEN_WIDTH, SCREEN_HEIGHT, self.rooms[self.current_room].background)
@@ -196,13 +240,22 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
             self.player_sprite.center_x = SCREEN_WIDTH
 
+        for coin in self.coin_list:
+            coin.follow_sprite(self.player_sprite)
+
+        # Generate a list of all sprites that collided with the player.
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
+
+        # Loop through each colliding sprite, remove it, and add to the score.
+        for coin in hit_list:
+            coin.remove_from_sprite_lists()
+            self.score += 1
 
 def main():
     """ Main function """
     window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     window.setup()
     arcade.run()
-
 
 if __name__ == "__main__":
     main()
