@@ -1,19 +1,28 @@
+"""
+Sprite Bullets
+
+Simple program to show basic sprite usage.
+
+Artwork from https://kenney.nl
+
+If Python and Arcade are installed, this example can be run from the command line with:
+python -m arcade.examples.sprite_bullets
+"""
+import random
 import arcade
 import os
-import random
 
-# Constants
 SPRITE_SCALING_PLAYER = 0.5
 SPRITE_SCALING_COIN = 0.2
-SPRITE_SCALING_LASER = 0.7
+SPRITE_SCALING_LASER = 0.8
 COIN_COUNT = 50
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Better Move Sprite with Keyboard and Sword Arc Attack"
+SCREEN_TITLE = "Sprites and Bullets Example"
 
-MOVEMENT_SPEED = 5
 BULLET_SPEED = 5
+MOVEMENT_SPEED = 5
 
 class Player(arcade.Sprite):
     def update(self):
@@ -31,39 +40,11 @@ class Player(arcade.Sprite):
         elif self.top > SCREEN_HEIGHT - 1:
             self.top = SCREEN_HEIGHT - 1
 
-class Sword(arcade.Sprite):
-    def __init__(self, image, scaling):
-        super().__init__(image, scaling)
-        self.visible = False
-        self.start_time = None
-        self.direction = 0
-
-    def start_swing(self, player):
-        
-        # Direction du joueur (on utilise la dernière direction connue si le joueur est immobile)
-        if player.change_x > 0:
-            self.direction = 0  # Droite
-        elif player.change_x < 0:
-            self.direction = 180  # Gauche
-        elif player.change_y > 0:
-            self.direction = 90  # Haut
-        elif player.change_y < 0:
-            self.direction = -90  # Bas
-
-    def update_position(self, player):
-        """Mise à jour de la position pour créer un mouvement d'arc."""
-        if not self.visible:
-            return
-
 class MyGame(arcade.Window):
-    def __init__(self, width, height, title):
-        super().__init__(width, height, title)
-        self.player_list = None
-        self.player_sprite = None
-        self.left_pressed = False
-        self.right_pressed = False
-        self.up_pressed = False
-        self.down_pressed = False
+    """ Main application class. """
+
+    def __init__(self):
+        """ Initializer """
         # Call the parent class initializer
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
@@ -91,17 +72,9 @@ class MyGame(arcade.Window):
         self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
 
         arcade.set_background_color(arcade.color.AMAZON)
-        
+
     def setup(self):
-        self.player_list = arcade.SpriteList()
-        self.player_sprite = Player(":resources:images/animated_characters/female_person/femalePerson_idle.png",
-                                    SPRITE_SCALING_PLAYER)
-        self.player_sprite.center_x = 50
-        self.player_sprite.center_y = 50
-        self.player_list.append(self.player_sprite)
-        self.sword_sprite = Sword(":resources:gui_basic_assets/items/sword_gold.png", SPRITE_SCALING_LASER)
-        self.player_list.append(self.sword_sprite)
-        
+
         """ Set up the game and initialize the variables. """
 
         # Sprite lists
@@ -137,27 +110,26 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.color.AMAZON)
 
     def on_draw(self):
+        """
+        Render the screen.
+        """
+
+        # This command has to happen before we start drawing
         self.clear()
+
+        # Draw all the sprites.
+        self.coin_list.draw()
+        self.bullet_list.draw()
         self.player_list.draw()
 
-    def update_player_speed(self):
-        self.player_sprite.change_x = 0
-        self.player_sprite.change_y = 0
-        if self.up_pressed and not self.down_pressed:
-            self.player_sprite.change_y = MOVEMENT_SPEED
-        elif self.down_pressed and not self.up_pressed:
-            self.player_sprite.change_y = -MOVEMENT_SPEED
-        if self.left_pressed and not self.right_pressed:
-            self.player_sprite.change_x = -MOVEMENT_SPEED
-        elif self.right_pressed and not self.left_pressed:
-            self.player_sprite.change_x = MOVEMENT_SPEED
+        # Render the text
+        arcade.draw_text(f"Score: {self.score}", 10, 20, arcade.color.WHITE, 14)
 
-    def on_update(self, delta_time):
-        self.player_list.update()
-        if self.sword_active:
-            self.sword_sprite.update_position(self.player_sprite)
-            if not self.sword_sprite.visible:
-                self.sword_active = False
+    def on_mouse_motion(self, x, y, dx, dy):
+        """
+        Called whenever the mouse moves.
+        """
+        self.player_sprite.center_x = x
 
     def on_mouse_press(self, x, y, button, modifiers):
         """
@@ -182,38 +154,40 @@ class MyGame(arcade.Window):
         # Add the bullet to the appropriate lists
         self.bullet_list.append(bullet)
 
-    def on_key_press(self, key, modifiers):
-        if key == arcade.key.Z:
-            self.up_pressed = True
-            self.update_player_speed()
-        elif key == arcade.key.S:
-            self.down_pressed = True
-            self.update_player_speed()
-        elif key == arcade.key.Q:
-            self.left_pressed = True
-            self.update_player_speed()
-        elif key == arcade.key.D:
-            self.right_pressed = True
-            self.update_player_speed()
+    def on_update(self, delta_time):
+        """ Movement and game logic """
 
-    def on_key_release(self, key, modifiers):
-        if key == arcade.key.Z:
-            self.up_pressed = False
-            self.update_player_speed()
-        elif key == arcade.key.S:
-            self.down_pressed = False
-            self.update_player_speed()
-        elif key == arcade.key.Q:
-            self.left_pressed = False
-            self.update_player_speed()
-        elif key == arcade.key.D:
-            self.right_pressed = False
-            self.update_player_speed()
+        # Call update on bullet sprites
+        self.bullet_list.update()
+
+        # Loop through each bullet
+        for bullet in self.bullet_list:
+
+            # Check this bullet to see if it hit a coin
+            hit_list = arcade.check_for_collision_with_list(bullet, self.coin_list)
+
+            # If it did, get rid of the bullet
+            if len(hit_list) > 0:
+                bullet.remove_from_sprite_lists()
+
+            # For every coin we hit, add to the score and remove the coin
+            for coin in hit_list:
+                coin.remove_from_sprite_lists()
+                self.score += 1
+
+                # Hit Sound
+                arcade.play_sound(self.hit_sound)
+
+            # If the bullet flies off-screen, remove it.
+            if bullet.bottom > SCREEN_HEIGHT:
+                bullet.remove_from_sprite_lists()
+
 
 def main():
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = MyGame()
     window.setup()
     arcade.run()
+
 
 if __name__ == "__main__":
     main()
