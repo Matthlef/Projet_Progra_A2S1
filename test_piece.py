@@ -64,10 +64,11 @@ def setup_room_1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-            wall.left = x
-            wall.bottom = y
-            room.wall_list.append(wall)
+            if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x==0:
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
 
     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png",
                          SPRITE_SCALING)
@@ -236,10 +237,339 @@ def setup_room_B1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+    
+def setup_room_4():
+    """
+    Create and return room 4.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_P1():
+    """
+    Create and return room P1.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_5():
+    """
+    Create and return room 5.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_P2():
+    """
+    Create and return room P2.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_6():
+    """
+    Create and return room 6.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_7():
+    """
+    Create and return room 7.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_P3():
+    """
+    Create and return room P3.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 6 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    return room
+
+def setup_room_Boss():
+    """
+    Create and return room Boss.
+    """
+    room = Room()
+
+    """ Set up the game and initialize the variables. """
+    # Sprite lists
+    room.wall_list = arcade.SpriteList()
+
+    # -- Set up the walls
+    # Create bottom and top row of boxes
+    # This y loops a list of two, the coordinate 0, and just under the top of window
+    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
+        # Loop for each box going across
+        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+            if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
+                # Skip making a block 6 and 7 blocks up
+                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall.left = x
+                    wall.bottom = y
+                    room.wall_list.append(wall)
 
     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
     wall.left = 5 * SPRITE_SIZE
@@ -394,6 +724,14 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
             self.player_sprite.center_y = 0
 
+        elif self.player_sprite.center_x < 0 and self.current_room == 4:
+            self.current_room = 0
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+            self.player_sprite.center_x = SCREEN_WIDTH
+        elif self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 0:
+            self.current_room = 4
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+            self.player_sprite.center_x = 0
 def main():
     """ Main function """
     window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
