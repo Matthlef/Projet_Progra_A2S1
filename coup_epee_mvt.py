@@ -5,7 +5,7 @@ Simple program to show basic sprite usage.
 
 Artwork from https://kenney.nl
 
-If Python and Arcade are installed, this example can be run from the command line with:
+If Python and Arcade are installed, this example can be run from the command line with:zq
 python -m arcade.examples.sprite_bullets
 """
 import random
@@ -21,8 +21,13 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprites and Bullets Example"
 
-BULLET_SPEED = 5
+BULLET_SPEED = 7
 MOVEMENT_SPEED = 5
+
+Dir_bullet_droite = False
+Dir_bullet_gauche = False
+Dir_bullet_haut = False
+Dir_bullet_bas = False
 
 class Player(arcade.Sprite):
     def update(self):
@@ -71,7 +76,7 @@ class MyGame(arcade.Window):
         self.down_pressed = False
 
         # Don't show the mouse cursor
-        self.set_mouse_visible(True)
+        self.set_mouse_visible(False)
 
         # Load sounds. Sounds from kenney.nl
         self.gun_sound = arcade.load_sound(":resources:sounds/hurt5.wav")
@@ -130,12 +135,6 @@ class MyGame(arcade.Window):
         # Render the text
         arcade.draw_text(f"Score: {self.score}", 10, 20, arcade.color.WHITE, 14)
 
-    #def on_mouse_motion(self, x, y, dx, dy):
-        """
-        Called whenever the mouse moves.
-        """
-        #self.player_sprite.center_x = x
-
     def update_player_speed(self):
         # Calculate speed based on the keys pressed
 
@@ -163,17 +162,34 @@ class MyGame(arcade.Window):
         # Create a bullet
         bullet = arcade.Sprite(":resources:gui_basic_assets/items/sword_gold.png", SPRITE_SCALING_LASER)
 
-        # The image points to the right, and we want it to point up. So
-        # rotate it.
-        bullet.angle = 0
+        #Coup en haut
+        if Dir_bullet_gauche == False and Dir_bullet_droite == False and Dir_bullet_bas == True and Dir_bullet_haut == False :
+            bullet.angle = 180
+            bullet.change_y = -BULLET_SPEED
+            bullet.center_x = self.player_sprite.center_x
+            bullet.top = self.player_sprite.bottom
 
-        # Give the bullet a speed
-        bullet.change_y = BULLET_SPEED
+        #Coup en bas
+        elif Dir_bullet_gauche == False and Dir_bullet_droite == False and Dir_bullet_bas == False and Dir_bullet_haut == True :
+            bullet.angle = 0
+            bullet.change_y = BULLET_SPEED
+            bullet.center_x = self.player_sprite.center_x
+            bullet.bottom = self.player_sprite.top
 
-        # Position the bullet
-        bullet.center_x = self.player_sprite.center_x
-        bullet.bottom = self.player_sprite.top
+        #Coup à droite
+        elif Dir_bullet_gauche == False and Dir_bullet_droite == True and Dir_bullet_bas == False and Dir_bullet_haut == False :
+            bullet.angle = -90
+            bullet.change_x = BULLET_SPEED
+            bullet.center_y = self.player_sprite.center_y
+            bullet.left = self.player_sprite.right
 
+        #Coup à gauche
+        elif Dir_bullet_gauche == True and Dir_bullet_droite == False and Dir_bullet_bas == False and Dir_bullet_haut == False :
+            bullet.angle = 90
+            bullet.change_x = -BULLET_SPEED
+            bullet.center_y = self.player_sprite.center_y
+            bullet.right = self.player_sprite.left
+                
         # Add the bullet to the appropriate lists
         self.bullet_list.append(bullet)
 
@@ -194,6 +210,9 @@ class MyGame(arcade.Window):
             if len(hit_list) > 0:
                 bullet.remove_from_sprite_lists()
 
+            if len(self.bullet_list) > 1 or (abs(bullet.center_x - self.player_sprite.center_x) > 50) or (abs(bullet.center_y - self.player_sprite.center_y) > 50):
+                bullet.remove_from_sprite_lists()
+
             # For every coin we hit, add to the score and remove the coin
             for coin in hit_list:
                 coin.remove_from_sprite_lists()
@@ -209,21 +228,39 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
 
+        global Dir_bullet_droite, Dir_bullet_gauche, Dir_bullet_haut, Dir_bullet_bas
+
         if key == arcade.key.Z :
             self.up_pressed = True
             self.update_player_speed()
+            Dir_bullet_droite = False
+            Dir_bullet_gauche = False
+            Dir_bullet_haut = True
+            Dir_bullet_bas = False
 
         elif key == arcade.key.S :
             self.down_pressed = True
             self.update_player_speed()
+            Dir_bullet_droite = False
+            Dir_bullet_gauche = False
+            Dir_bullet_haut = False
+            Dir_bullet_bas = True
 
         elif key == arcade.key.Q :
             self.left_pressed = True
             self.update_player_speed()
+            Dir_bullet_droite = False
+            Dir_bullet_gauche = True
+            Dir_bullet_haut = False
+            Dir_bullet_bas = False
 
         elif key == arcade.key.D :
             self.right_pressed = True
             self.update_player_speed()
+            Dir_bullet_droite = True
+            Dir_bullet_gauche = False
+            Dir_bullet_haut = False
+            Dir_bullet_bas = False
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
