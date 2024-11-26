@@ -55,16 +55,17 @@ class Player(arcade.Sprite):
         )
         self.health: int = PLAYER_HEALTH
 
-class Mob(arcade.Sprite):
+class MOB(arcade.Sprite):
     def __init__(self, bar_list: arcade.SpriteList) -> None:
         super().__init__(
-            filename=image_female_person_idle,
-            scale=SPRITE_SCALING_ENEMY,
+            filename=image_zombie_idle,
+            scale= SPRITE_SCALING_ENEMY
         )
-        self.indicator_bar: IndicatorBar = IndicatorBarMob(
+        self.indicator_bar: IndicatorBarMob = IndicatorBarMob(
             self, bar_list, (self.center_x, self.center_y)
         )
         self.health: int = PLAYER_HEALTH
+
 
 class Bullet(arcade.Sprite):
     def __init__(self) -> None:
@@ -209,7 +210,7 @@ class IndicatorBarMob:
 
     def __init__(
         self,
-        owner: Mob,
+        owner: MOB,
         sprite_list: arcade.SpriteList,
         position: Tuple[float, float] = (0, 0),
         full_color: arcade.Color = arcade.color.GREEN,
@@ -219,7 +220,7 @@ class IndicatorBarMob:
         border_size: int = 4,
     ) -> None:
         # Store the reference to the owner and the sprite list
-        self.owner: Mob = owner
+        self.owner: MOB = owner
         self.sprite_list: arcade.SpriteList = sprite_list
 
         # Set the needed size variables
@@ -249,7 +250,7 @@ class IndicatorBarMob:
         self.position: Tuple[float, float] = position
 
     def __repr__(self) -> str:
-        return f"<IndicatorBarMob (Owner={self.owner})>"
+        return f"<IndicatorBar (Owner={self.owner})>"
 
     @property
     def background_box(self) -> arcade.SpriteSolidColor:
@@ -303,14 +304,14 @@ class IndicatorBarMob:
             # Make sure full_box is to the left of the bar instead of the middle
             self.full_box.left = self._center_x - (self._box_width // 2)
 
-
 class MyGame(arcade.Window):
     def __init__(self) -> None:
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         self.bullet_list = arcade.SpriteList()
+        self.bullet_listA = arcade.SpriteList()
         self.bar_list = arcade.SpriteList()
         self.player_sprite = Player(self.bar_list)
-        self.enemy_sprite = Mob(self.bar_list)
+        self.enemy_sprite = MOB(self.bar_list)
         self.top_text: arcade.Text = arcade.Text(
             "Dodge the bullets by moving the mouse!",
             self.width // 2,
@@ -343,6 +344,7 @@ class MyGame(arcade.Window):
         self.player_sprite.draw()
         self.enemy_sprite.draw()
         self.bullet_list.draw()
+        self.bullet_listA.draw()
         self.bar_list.draw()
 
         # Draw the text objects
@@ -358,6 +360,7 @@ class MyGame(arcade.Window):
         # Check if the player is dead. If so, exit the game
         if self.player_sprite.health <= 0:
             arcade.exit()
+
         if self.enemy_sprite.health <= 0:
             arcade.exit()
 
@@ -371,12 +374,13 @@ class MyGame(arcade.Window):
         )
 
         self.enemy_sprite.indicator_bar.position = (
-            self.player_sprite.center_x,
-            self.player_sprite.center_y + INDICATOR_BAR_OFFSET,
+            self.enemy_sprite.center_x,
+            self.enemy_sprite.center_y + INDICATOR_BAR_OFFSET,
         )
 
         # Call updates on bullet sprites
         self.bullet_list.on_update(delta_time)
+        self.bullet_listA.on_update(delta_time)
 
         # Check if the enemy can attack. If so, shoot a bullet from the
         # enemy towards the player
@@ -385,9 +389,11 @@ class MyGame(arcade.Window):
 
             # Create the bullet
             bullet = Bullet()
+            bulletA = Bullet()
 
             # Set the bullet's position
             bullet.position = self.enemy_sprite.position
+            bulletA.position = self.player_sprite.position
 
             # Set the bullet's angle to face the player
             diff_x = self.player_sprite.center_x - self.enemy_sprite.center_x
@@ -398,39 +404,28 @@ class MyGame(arcade.Window):
                 angle_deg += 360
             bullet.angle = angle_deg
 
-            # Give the bullet a velocity towards the player
-            bullet.change_x = math.cos(angle) * BULLET_SPEED
-            bullet.change_y = math.sin(angle) * BULLET_SPEED
-
-            # Add the bullet to the bullet list
-            self.bullet_list.append(bullet)
-
-        if self.enemy_timer >= ENEMY_ATTACK_COOLDOWN:
-            self.enemy_timer = 0
-
-            # Create the bullet
-            bullet = Bullet()
-
-            # Set the bullet's position
-            bullet.position = self.player_sprite.position
-
-            # Set the bullet's angle to face the player
-            diff_x = self.enemy_sprite.center_x - self.player_sprite.center_x
-            diff_y = self.enemy_sprite.center_y - self.player_sprite.center_y
-            angle = math.atan2(diff_y, diff_x)
-            angle_deg = math.degrees(angle)
-            if angle_deg < 0:
-                angle_deg += 360
-            bullet.angle = angle_deg
+            # Set the bullet's angle to face the mob
+            diff_xA = self.enemy_sprite.center_x - self.player_sprite.center_x
+            diff_yA = self.enemy_sprite.center_y - self.player_sprite.center_y
+            angleA = math.atan2(diff_yA, diff_xA)
+            angle_degA = math.degrees(angleA)
+            if angle_degA < 0:
+                angle_degA += 360
+            bulletA.angle = angle_degA
 
             # Give the bullet a velocity towards the player
             bullet.change_x = math.cos(angle) * BULLET_SPEED
             bullet.change_y = math.sin(angle) * BULLET_SPEED
 
+            # Give the bullet a velocity towards the mob
+            bulletA.change_x = math.cos(angleA) * BULLET_SPEED
+            bulletA.change_y = math.sin(angleA) * BULLET_SPEED
+
             # Add the bullet to the bullet list
             self.bullet_list.append(bullet)
+            self.bullet_listA.append(bulletA)
 
-        # Loop through each bullet
+        # Loop through each bullet 
         for existing_bullet in self.bullet_list:
             # Check if the bullet has gone off-screen. If so, delete the bullet
             if sprite_off_screen(existing_bullet):
@@ -447,7 +442,23 @@ class MyGame(arcade.Window):
                 self.player_sprite.indicator_bar.fullness = (
                     self.player_sprite.health / PLAYER_HEALTH
                 )
+            
+        for existing_bullet in self.bullet_listA:
+            # Check if the bullet has gone off-screen. If so, delete the bullet
+            if sprite_off_screen(existing_bullet):
+                existing_bullet.remove_from_sprite_lists()
+                continue
 
+            # Check if the bullet has hit the player
+            if arcade.check_for_collision(existing_bullet, self.enemy_sprite):
+                # Damage the player and remove the bullet
+                self.enemy_sprite.health -= BULLET_DAMAGE
+                existing_bullet.remove_from_sprite_lists()
+
+                # Set the player's indicator bar fullness
+                self.enemy_sprite.indicator_bar.fullness = (
+                    self.enemy_sprite.health / PLAYER_HEALTH
+                )
 
 def main() -> None:
     """Main Program."""
