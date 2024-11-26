@@ -61,7 +61,7 @@ class Mob(arcade.Sprite):
             filename=image_female_person_idle,
             scale=SPRITE_SCALING_ENEMY,
         )
-        self.indicator_bar: IndicatorBar = IndicatorBar(
+        self.indicator_bar: IndicatorBar = IndicatorBarMob(
             self, bar_list, (self.center_x, self.center_y)
         )
         self.health: int = PLAYER_HEALTH
@@ -249,7 +249,7 @@ class IndicatorBarMob:
         self.position: Tuple[float, float] = position
 
     def __repr__(self) -> str:
-        return f"<IndicatorBar (Owner={self.owner})>"
+        return f"<IndicatorBarMob (Owner={self.owner})>"
 
     @property
     def background_box(self) -> arcade.SpriteSolidColor:
