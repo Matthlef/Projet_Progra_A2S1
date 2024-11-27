@@ -54,7 +54,7 @@ def setup_room_1():
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7) or y==0:
-            # Skip making a block 6 and 7 blocks up
+                # Skip making a block 6 and 7 blocks up
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -64,11 +64,10 @@ def setup_room_1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-            if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x==0:
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-                wall.left = x
-                wall.bottom = y
-                room.wall_list.append(wall)
+            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall.left = x
+            wall.bottom = y
+            room.wall_list.append(wall)
 
     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png",
                          SPRITE_SCALING)
@@ -112,7 +111,7 @@ def setup_room_2():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x==0:
-            # Skip making a block 4 and 5 blocks up on the right side
+                # Skip making a block 4 and 5 blocks on the right side
                 wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -127,9 +126,9 @@ def setup_room_2():
 
     return room
 
-def setup_room_B2():
+def setup_room_P1():
     """
-    Create and return room B2.
+    Create and return room P1.
     """
     room = Room()
 
@@ -144,7 +143,7 @@ def setup_room_B2():
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7) or y != 0:
-                # Skip making a block 6 and 7 blocks up
+                # Skip making a block 6 and 7 blocks dawn
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -237,11 +236,10 @@ def setup_room_B1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-                if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-                    wall.left = x
-                    wall.bottom = y
-                    room.wall_list.append(wall)
+                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                 wall.left = x
+                 wall.bottom = y
+                 room.wall_list.append(wall)
 
     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
     wall.left = 5 * SPRITE_SIZE
@@ -268,7 +266,7 @@ def setup_room_4():
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3) or y==0:
-                # Skip making a block 6 and 7 blocks up
+                # Skip making a block 2 and 3 blocks up
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -278,7 +276,8 @@ def setup_room_4():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-                if (y != SPRITE_SIZE * 5 and y!= SPRITE_SIZE * 4) :
+                if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5) :
+                    # Skip making a block 4 and 5 blocks on the right and left side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -292,9 +291,9 @@ def setup_room_4():
 
     return room
 
-def setup_room_P1():
+def setup_room_B2():
     """
-    Create and return room P1.
+    Create and return room B2.
     """
     room = Room()
 
@@ -318,6 +317,7 @@ def setup_room_P1():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x !=0:
+                    # Skip making a block 4 and 5 blocks on the left side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -348,7 +348,7 @@ def setup_room_5():
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3):
-                # Skip making a block 6 and 7 blocks up
+                # Skip making a block 2 and 3 blocks up and down
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -359,6 +359,7 @@ def setup_room_5():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
+                    # Skip making a block 6 and 7 blocks on the left side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -389,7 +390,7 @@ def setup_room_P2():
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y!=0:
-                # Skip making a block 6 and 7 blocks up
+                # Skip making a block 6 and 7 blocks down
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -400,6 +401,7 @@ def setup_room_P2():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x==0:
+                    # Skip making a block 6 and 7 blocks on the right side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -430,7 +432,7 @@ def setup_room_6():
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3)or y!=0:
-                # Skip making a block 6 and 7 blocks up
+                # Skip making a block 2 and 3 blocks down
                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
@@ -441,6 +443,7 @@ def setup_room_6():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x!=0:
+                    # Skip making a block 4 and 5 blocks on the left side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -482,6 +485,7 @@ def setup_room_7():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5):
+                    # Skip making a block 4 and 5 blocks on the left and right side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -521,6 +525,7 @@ def setup_room_Boss():
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x==0:
+                    # Skip making a block 4 and 5 blocks on the right side
                     wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
                     wall.left = x
                     wall.bottom = y
@@ -579,7 +584,7 @@ class MyGame(arcade.Window):
         room = setup_room_2()
         self.rooms.append(room)
 
-        room = setup_room_B2()
+        room = setup_room_P1()
         self.rooms.append(room)
 
         room = setup_room_3()
@@ -591,7 +596,7 @@ class MyGame(arcade.Window):
         room = setup_room_4()
         self.rooms.append(room)
 
-        room = setup_room_P1()
+        room = setup_room_B2()
         self.rooms.append(room)
 
         room = setup_room_5()
@@ -699,15 +704,6 @@ class MyGame(arcade.Window):
             self.current_room = 3
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
             self.player_sprite.center_y = 0
-
-        elif self.player_sprite.center_x < 0 and self.current_room == 4:
-            self.current_room = 0
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = SCREEN_WIDTH
-        elif self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 0:
-            self.current_room = 4
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = 0
 
         elif self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 3:
             self.current_room = 5
