@@ -76,7 +76,7 @@ class MyGame(arcade.Window):
         self.down_pressed = False
 
         # Don't show the mouse cursor
-        self.set_mouse_visible(False)
+        self.set_mouse_visible(True)
 
         # Load sounds. Sounds from kenney.nl
         self.gun_sound = arcade.load_sound(":resources:sounds/hurt5.wav")
