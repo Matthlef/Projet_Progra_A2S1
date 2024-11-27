@@ -55,7 +55,7 @@ def setup_room_1():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7) or y==0:
                 # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
