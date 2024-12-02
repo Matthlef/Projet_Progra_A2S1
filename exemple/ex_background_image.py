@@ -69,6 +69,9 @@ class MyGame(arcade.Window):
         # https://wallpaper-gallery.net/single/free-background-images/free-background-images-22.html
 
         self.background = arcade.load_texture(os.path.dirname(__file__)+'/space_station_floor.jpg')
+        #sinon tu mets : print(os.getcwd()) tu recupère dans le terminal et tu remplaces les \ par des / 
+        # et tu peux choisir directements si tu veux prendre dans le fichier images en remplaçant au bon endroit
+        # sinon il faut mettre les images dans le dossier du code
 
 
         # Sprite lists
