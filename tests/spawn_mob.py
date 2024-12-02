@@ -580,19 +580,7 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y = 100
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player_sprite)
-        self.coin_list = arcade.SpriteList()
-
-        for i in range(50):
-
-            # Create the coin instance
-            coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
-
-            # Position the coin
-            coin.center_x = random.randrange(SCREEN_WIDTH)
-            coin.center_y = random.randrange(SCREEN_HEIGHT)
-
-            # Add the coin to the lists
-            self.coin_list.append(coin)
+        self.coin_list = []
 
         # Our list of rooms
         self.rooms = []
@@ -634,6 +622,18 @@ class MyGame(arcade.Window):
         room = setup_room_Boss()
         self.rooms.append(room)
 
+        for i in range(len(self.rooms)):
+            c = arcade.SpriteList()
+            for n in range(10):            
+                coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
+
+            # Position the coin
+                coin.center_x = random.randrange(SCREEN_WIDTH)
+                coin.center_y = random.randrange(SCREEN_HEIGHT)
+                c.append(coin)
+            # Add the coin to the lists
+            self.coin_list.append(c)
+
         # Our starting room number
         self.current_room = 0
 
@@ -660,10 +660,8 @@ class MyGame(arcade.Window):
 
         self.player_list.draw()
         
-        self.coin_list.draw()
+        self.coin_list[self.current_room].draw()
         arcade.draw_text(f"Score: {self.score}", 10, 20, arcade.color.WHITE, 14)
-
-
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -692,10 +690,10 @@ class MyGame(arcade.Window):
         # example though.)
         self.physics_engine.update()
 
-        self.coin_list.update()
+        #self.coin_list.update()
 
         # Generate a list of all sprites that collided with the player.
-        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list)
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list[self.current_room])
 
         # Loop through each colliding sprite, remove it, and add to the score.
         for coin in hit_list:
