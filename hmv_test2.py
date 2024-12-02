@@ -1,15 +1,7 @@
-"""
-Sprite Health Bar
-
-Artwork from https://kenney.nl
-
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.sprite_health
-"""
-import math
-from typing import Tuple
 import arcade
 import os
+import math
+from typing import Tuple
 
 from arcade.resources import (
     image_female_person_idle,
@@ -19,26 +11,27 @@ from arcade.resources import (
 
 SPRITE_SCALING_PLAYER = 0.5
 SPRITE_SCALING_ENEMY = 0.5
+MOVEMENT_SPEED = 5
+
 SPRITE_SCALING_BULLET = 1
-INDICATOR_BAR_OFFSET = 32
-ENEMY_ATTACK_COOLDOWN = 1
+SPRITE_SCALING_EPEE = 0.7
+EPEE_SPEED = 7
 BULLET_SPEED = 150
 BULLET_DAMAGE = 1
+
+INDICATOR_BAR_OFFSET = 32
+ENEMY_ATTACK_COOLDOWN = 2
+
 PLAYER_HEALTH = 5
-SPRITE_SCALING_LASER = 0.7
-
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Assemblage mob joueur"
-
-LASER_SPEED = 7
-MOVEMENT_SPEED = 5
 
 Dir_bullet_droite = False
 Dir_bullet_gauche = False
 Dir_bullet_haut = False
 Dir_bullet_bas = False
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+SCREEN_TITLE = "Assemblage, la bagarre"
 
 def sprite_off_screen(
     sprite: arcade.Sprite,
@@ -53,7 +46,6 @@ def sprite_off_screen(
         or sprite.left > screen_width
     )
 
-
 class Player(arcade.Sprite):
     def __init__(self, bar_list: arcade.SpriteList) -> None:
         super().__init__(
@@ -64,20 +56,21 @@ class Player(arcade.Sprite):
             self, bar_list, (self.center_x, self.center_y)
         )
         self.health: int = PLAYER_HEALTH
-        def update(self):
-            """ Move the player """
-            self.center_x += self.change_x
-            self.center_y += self.change_y
 
-            # Check for out-of-bounds
-            if self.left < 0:
-                self.left = 0
-            elif self.right > SCREEN_WIDTH - 1:
-                self.right = SCREEN_WIDTH - 1
-            if self.bottom < 0:
-                self.bottom = 0
-            elif self.top > SCREEN_HEIGHT - 1:
-                self.top = SCREEN_HEIGHT - 1
+    def update(self):
+        """ Move the player """
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        # Check for out-of-bounds
+        if self.left < 0:
+            self.left = 0
+        elif self.right > SCREEN_WIDTH - 1:
+            self.right = SCREEN_WIDTH - 1
+        if self.bottom < 0:
+            self.bottom = 0
+        elif self.top > SCREEN_HEIGHT - 1:
+            self.top = SCREEN_HEIGHT - 1
 
 class MOB(arcade.Sprite):
     def __init__(self, bar_list: arcade.SpriteList) -> None:
@@ -89,7 +82,6 @@ class MOB(arcade.Sprite):
             self, bar_list, (self.center_x, self.center_y)
         )
         self.health: int = PLAYER_HEALTH
-
 
 class Bullet(arcade.Sprite):
     def __init__(self) -> None:
@@ -104,7 +96,6 @@ class Bullet(arcade.Sprite):
             self.center_x + self.change_x * delta_time,
             self.center_y + self.change_y * delta_time,
         )
-
 
 class IndicatorBar:
     """
@@ -329,23 +320,18 @@ class IndicatorBarMob:
             self.full_box.left = self._center_x - (self._box_width // 2)
 
 class MyGame(arcade.Window):
-    def __init__(self) -> None:
+    def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE):
+        """ Initializer """
+        # Call the parent class initializer
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        os.chdir(file_path)
-
         self.bullet_list = arcade.SpriteList()
-        self.bullet_listA = arcade.SpriteList()
+        self.epee_list = arcade.SpriteList()
+        
+        self.player_list =  arcade.SpriteList()
+        
         self.bar_list = arcade.SpriteList()
-        #self.player_list = arcade.SpriteList()
-
         self.player_sprite = Player(self.bar_list)
         self.enemy_sprite = MOB(self.bar_list)
-
-        self.top_text: arcade.Text = arcade.Text("Dodge the bullets by moving the mouse!",self.width // 2,self.height - 50,anchor_x="center")
-        self.bottom_text: arcade.Text = arcade.Text("When your health bar reaches zero, you lose!",self.width // 2,50,anchor_x="center",)
-        
         self.enemy_timer = 0
 
         # Track the current state of what key is pressed
@@ -353,8 +339,8 @@ class MyGame(arcade.Window):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
-        
-        # Don't show the mouse cursor
+
+        #show the mouse cursor
         self.set_mouse_visible(True)
 
         # Load sounds. Sounds from kenney.nl
@@ -370,6 +356,8 @@ class MyGame(arcade.Window):
         # Set the background color
         self.background_color = arcade.color.AMAZON
 
+        self.player_list.append(self.player_sprite)
+
     def on_draw(self) -> None:
         """Render the screen."""
         # Clear the screen. This command has to happen before we start drawing
@@ -378,16 +366,13 @@ class MyGame(arcade.Window):
         # Draw all the sprites
         self.player_sprite.draw()
         self.enemy_sprite.draw()
-        self.bullet_list.draw()
-        self.bullet_listA.draw()
-        self.bar_list.draw()
-        self.player_sprite.center_x = 50
-        self.player_sprite.center_y = 50
-        #self.player_list.append(self.player_sprite)
 
-        # Draw the text objects
-        self.top_text.draw()
-        self.bottom_text.draw()
+        self.bullet_list.draw()
+        self.epee_list.draw()
+
+        self.bar_list.draw()
+
+        self.player_list.draw()
 
     def update_player_speed(self):
         # Calculate speed based on the keys pressed
@@ -414,38 +399,38 @@ class MyGame(arcade.Window):
         # Gunshot sound
         arcade.play_sound(self.gun_sound)
         # Create a bullet
-        bulletA = arcade.Sprite(":resources:gui_basic_assets/items/sword_gold.png", SPRITE_SCALING_LASER)
+        epee = arcade.Sprite(":resources:gui_basic_assets/items/sword_gold.png", SPRITE_SCALING_EPEE)
 
         #Coup en haut
         if Dir_bullet_gauche == False and Dir_bullet_droite == False and Dir_bullet_bas == True and Dir_bullet_haut == False :
-            bulletA.angle = 180
-            bulletA.change_y = -LASER_SPEED
-            bulletA.center_x = self.player_sprite.center_x
-            bulletA.top = self.player_sprite.bottom
+            epee.angle = 180
+            epee.change_y = -EPEE_SPEED
+            epee.center_x = self.player_sprite.center_x
+            epee.top = self.player_sprite.bottom
 
         #Coup en bas
         elif Dir_bullet_gauche == False and Dir_bullet_droite == False and Dir_bullet_bas == False and Dir_bullet_haut == True :
-            bulletA.angle = 0
-            bulletA.change_y = LASER_SPEED
-            bulletA.center_x = self.player_sprite.center_x
-            bulletA.bottom = self.player_sprite.top
+            epee.angle = 0
+            epee.change_y = EPEE_SPEED
+            epee.center_x = self.player_sprite.center_x
+            epee.bottom = self.player_sprite.top
 
         #Coup à droite
         elif Dir_bullet_gauche == False and Dir_bullet_droite == True and Dir_bullet_bas == False and Dir_bullet_haut == False :
-            bulletA.angle = -90
-            bulletA.change_x = LASER_SPEED
-            bulletA.center_y = self.player_sprite.center_y
-            bulletA.left = self.player_sprite.right
+            epee.angle = -90
+            epee.change_x = EPEE_SPEED
+            epee.center_y = self.player_sprite.center_y
+            epee.left = self.player_sprite.right
 
         #Coup à gauche
         elif Dir_bullet_gauche == True and Dir_bullet_droite == False and Dir_bullet_bas == False and Dir_bullet_haut == False :
-            bulletA.angle = 90
-            bulletA.change_x = -LASER_SPEED
-            bulletA.center_y = self.player_sprite.center_y
-            bulletA.right = self.player_sprite.left
+            epee.angle = 90
+            epee.change_x = -EPEE_SPEED
+            epee.center_y = self.player_sprite.center_y
+            epee.right = self.player_sprite.left
                 
         # Add the bullet to the appropriate lists
-        self.bullet_listA.append(bulletA)
+        self.epee_list.append(epee)
 
     def on_update(self, delta_time) -> None:
         """Movement and game logic."""
@@ -465,7 +450,6 @@ class MyGame(arcade.Window):
             self.player_sprite.center_y + INDICATOR_BAR_OFFSET,
         )
 
-        # Update the MOB's indicator bar position
         self.enemy_sprite.indicator_bar.position = (
             self.enemy_sprite.center_x,
             self.enemy_sprite.center_y + INDICATOR_BAR_OFFSET,
@@ -473,7 +457,6 @@ class MyGame(arcade.Window):
 
         # Call updates on bullet sprites
         self.bullet_list.on_update(delta_time)
-        self.bullet_listA.on_update()
 
         # Check if the enemy can attack. If so, shoot a bullet from the
         # enemy towards the player
@@ -520,45 +503,27 @@ class MyGame(arcade.Window):
                     self.player_sprite.health / PLAYER_HEALTH
                 )
             
+        self.epee_list.update()
+        self.player_list.update()
+
         # Loop through each bullet
-        for existing_bullet in self.bullet_listA:
+        for epee in self.epee_list:
 
-            # Check this bullet to see if it hit a coin
-            hit_list = arcade.check_for_collision(existing_bullet, self.enemy_sprite)
-
-            # If it did, get rid of the bullet
-            if hit_list:
-                existing_bullet.remove_from_sprite_lists()
-
-            if len(self.bullet_list) > 1 or (abs(existing_bullet.center_x - self.player_sprite.center_x) > 50) or (abs(existing_bullet.center_y - self.player_sprite.center_y) > 50):
-                existing_bullet.remove_from_sprite_lists()
-
-            # enemy damage
-            if arcade.check_for_collision(existing_bullet, self.enemy_sprite):
-                # Damage the player andd remove the bullet
+            if arcade.check_for_collision(epee, self.enemy_sprite):
+                # Damage the enemy and remove the epee
                 self.enemy_sprite.health -= BULLET_DAMAGE
-                existing_bullet.remove_from_sprite_lists()
+                epee.remove_from_sprite_lists()
 
                 # Set the player's indicator bar fullness
                 self.enemy_sprite.indicator_bar.fullness = (
                     self.enemy_sprite.health / PLAYER_HEALTH
                 )
-        
-        self.update_player_speed()
 
-        # Appliquer la vitesse pour déplacer le joueur
-        self.player_sprite.center_x += self.player_sprite.change_x
-        self.player_sprite.center_y += self.player_sprite.change_y
+                # Hit Sound
+                arcade.play_sound(self.hit_sound)
 
-        # Empêche le joueur de sortir des limites de l'écran
-        if self.player_sprite.left < 0:
-            self.player_sprite.left = 0
-        elif self.player_sprite.right > SCREEN_WIDTH - 1:
-            self.player_sprite.right = SCREEN_WIDTH - 1
-        if self.player_sprite.bottom < 0:
-            self.player_sprite.bottom = 0
-        elif self.player_sprite.top > SCREEN_HEIGHT - 1:
-            self.player_sprite.top = SCREEN_HEIGHT - 1
+            if len(self.epee_list) > 1 or (abs(epee.center_x - self.player_sprite.center_x) > 50) or (abs(epee.center_y - self.player_sprite.center_y) > 50):
+                epee.remove_from_sprite_lists()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -618,10 +583,10 @@ class MyGame(arcade.Window):
 
 def main() -> None:
     """Main Program."""
-    window = MyGame()
+    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     window.setup()
     arcade.run()
 
-
 if __name__ == "__main__":
     main()
+
