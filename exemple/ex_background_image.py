@@ -19,7 +19,6 @@ SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Sprite Collect Coins with Background Example"
 
-
 class MyGame(arcade.Window):
     """
     Main application class.
@@ -69,7 +68,7 @@ class MyGame(arcade.Window):
 
         # https://wallpaper-gallery.net/single/free-background-images/free-background-images-22.html
 
-        self.background = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
+        self.background = arcade.load_texture(os.path.dirname(__file__)+'/space_station_floor.jpg')
 
 
         # Sprite lists
