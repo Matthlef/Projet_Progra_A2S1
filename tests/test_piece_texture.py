@@ -38,49 +38,51 @@ class Room:
 def setup_room_1():
     """
     Create and return room 1.
-    If your program gets large, you may want to separate this into different
-    files.
     """
     room = Room()
 
-    """ Set up the game and initialize the variables. """
     # Sprite lists
     room.wall_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
-    # This y loops a list of two, the coordinate 0, and just under the top of window
-    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
-        # Loop for each box going across
-        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7) or y==0:
-                # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
-                wall.left = x
-                wall.bottom = y
-                room.wall_list.append(wall)
-
-    # Create left and right column of boxes
-    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
-        # Loop for each box going across
-        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+    y = SCREEN_HEIGHT - SPRITE_SIZE
+    for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+        if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7) or y == 0:
+            wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall5.png"), SPRITE_SCALING/4)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png",
-                         SPRITE_SCALING)
-    wall.left = 7 * SPRITE_SIZE
-    wall.bottom = 5 * SPRITE_SIZE
-    room.wall_list.append(wall)
+    y = 0
+    for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+        wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
+        wall.left = x
+        wall.bottom = y
+        room.wall_list.append(wall)
 
-    # If you want coins or monsters in a level, then add that code here.
 
-    # Load the background image for this level.
-    room.background = arcade.load_texture(os.path.dirname(__file__)+'/space_station_floor.jpg')
+
+    # Create left and right column of boxes
+    x=0
+    for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+        wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
+        wall.left = x
+        wall.bottom = y
+        room.wall_list.append(wall)
+
+    x = SCREEN_WIDTH - SPRITE_SIZE
+    for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+        wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall4.png"), SPRITE_SCALING/4)
+        wall.left = x
+        wall.bottom = y
+        room.wall_list.append(wall)
+
+    # Set the background image for this room
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
+
 
 
 def setup_room_2():
@@ -101,7 +103,7 @@ def setup_room_2():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7): 
                 # Skip making a block 6 and 7 blocks up and down
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -112,17 +114,17 @@ def setup_room_2():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x==0:
                 # Skip making a block 4 and 5 blocks on the right side
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
             
 
-    wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall.jpg"), SPRITE_SCALING/4)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 4 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/tiles/planet.png")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -144,7 +146,7 @@ def setup_room_P1():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7) or y != 0:
                 # Skip making a block 6 and 7 blocks dawn
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -153,17 +155,13 @@ def setup_room_P1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
 
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
     return room
 
 def setup_room_3():
@@ -184,7 +182,7 @@ def setup_room_3():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
                 if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7):
                     # Skip making a block 6 and 7 blocks up and down
-                    wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
@@ -195,17 +193,23 @@ def setup_room_3():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5):
                 # Skip making a block 4 and 5 blocks up on the right and left side
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
             
 
-    wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/tiles/planet.png")
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -227,7 +231,7 @@ def setup_room_B1():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
                 # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -236,16 +240,17 @@ def setup_room_B1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                 wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                  wall.left = x
                  wall.bottom = y
                  room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_bonus.jpg"))
 
     return room
     
@@ -267,7 +272,7 @@ def setup_room_4():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3) or y==0:
                 # Skip making a block 2 and 3 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -278,16 +283,26 @@ def setup_room_4():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5) :
                     # Skip making a block 4 and 5 blocks on the right and left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 6 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 7 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -307,7 +322,7 @@ def setup_room_B2():
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
@@ -318,16 +333,16 @@ def setup_room_B2():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x !=0:
                     # Skip making a block 4 and 5 blocks on the left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_bonus.jpg"))
 
     return room
 
@@ -349,7 +364,7 @@ def setup_room_5():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3):
                 # Skip making a block 2 and 3 blocks up and down
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -360,17 +375,12 @@ def setup_room_5():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
                     # Skip making a block 6 and 7 blocks on the left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
-
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
     return room
 
 def setup_room_P2():
@@ -391,7 +401,7 @@ def setup_room_P2():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y!=0:
                 # Skip making a block 6 and 7 blocks down
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -402,16 +412,12 @@ def setup_room_P2():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x==0:
                     # Skip making a block 6 and 7 blocks on the right side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
 
     return room
 
@@ -433,7 +439,7 @@ def setup_room_6():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3)or y!=0:
                 # Skip making a block 2 and 3 blocks down
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -444,16 +450,16 @@ def setup_room_6():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x!=0:
                     # Skip making a block 4 and 5 blocks on the left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -475,7 +481,7 @@ def setup_room_7():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7) or y==0:
                 # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -486,16 +492,22 @@ def setup_room_7():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5):
                     # Skip making a block 4 and 5 blocks on the left and right side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -515,7 +527,7 @@ def setup_room_Boss():
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "Boss_wall.png"), SPRITE_SCALING/6)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
@@ -526,16 +538,12 @@ def setup_room_Boss():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x==0:
                     # Skip making a block 4 and 5 blocks on the right side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "Boss_wall.png"), SPRITE_SCALING/6)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "Boss_floor.png"))
 
     return room
 
