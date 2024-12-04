@@ -9,9 +9,9 @@ python -m arcade.examples.sprite_rooms
 
 import arcade
 import os
-import random
 import math
 from typing import Tuple
+import random
 
 from arcade.resources import (
     image_female_person_idle,
@@ -19,24 +19,33 @@ from arcade.resources import (
     image_zombie_idle,
 )
 
-COIN_SCALING = 0.25
-
 SPRITE_SCALING = 0.5
 SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
+
+SPRITE_SCALING_PLAYER = 0.3
+SPRITE_SCALING_ENEMY = 0.5
+MOVEMENT_SPEED = 4
+
+SPRITE_SCALING_BULLET = 1
+BULLET_SPEED = 150
+SPRITE_SCALING_EPEE = 0.7
+EPEE_SPEED = 8
+BULLET_DAMAGE = 1
+ENEMY_ATTACK_COOLDOWN = 1
+
+INDICATOR_BAR_OFFSET = 32
+PLAYER_HEALTH = 5
+ENEMY_HEALTH = 3
 
 SCREEN_WIDTH = SPRITE_SIZE * 14
 SCREEN_HEIGHT = SPRITE_SIZE * 10
 SCREEN_TITLE = "Sprite Rooms Example"
 
-MOVEMENT_SPEED = 20
-
-SPRITE_SCALING_ENEMY = 0.5
-SPRITE_SCALING_BULLET = 1
-BULLET_SPEED = 150
-INDICATOR_BAR_OFFSET = 32
-ENEMY_ATTACK_COOLDOWN = 1
-PLAYER_HEALTH = 5
+Dir_bullet_droite = False
+Dir_bullet_gauche = False
+Dir_bullet_haut = False
+Dir_bullet_bas = False
 
 def sprite_off_screen(
     sprite: arcade.Sprite,
@@ -51,6 +60,22 @@ def sprite_off_screen(
         or sprite.left > screen_width
     )
 
+class Player(arcade.Sprite):
+    def __init__(self, bar_list: arcade.SpriteList) -> None:
+        super().__init__(
+            filename=os.path.join(os.path.dirname(__file__), "doom_slayer.png"),
+            scale=SPRITE_SCALING_PLAYER,
+        )
+        self.indicator_bar: IndicatorBar = IndicatorBar(
+            self, bar_list, (self.center_x, self.center_y)
+        )
+        self.health: int = PLAYER_HEALTH
+
+    def update(self):
+        """ Move the player """
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
 class MOB(arcade.Sprite):
     def __init__(self, bar_list: arcade.SpriteList) -> None:
         super().__init__(
@@ -60,7 +85,7 @@ class MOB(arcade.Sprite):
         self.indicator_bar: IndicatorBarMob = IndicatorBarMob(
             self, bar_list, (self.center_x, self.center_y)
         )
-        self.health: int = PLAYER_HEALTH
+        self.health: int = ENEMY_HEALTH
 
 class Bullet(arcade.Sprite):
     def __init__(self) -> None:
@@ -75,6 +100,117 @@ class Bullet(arcade.Sprite):
             self.center_x + self.change_x * delta_time,
             self.center_y + self.change_y * delta_time,
         )
+
+class IndicatorBar:
+    """
+    Represents a bar which can display information about a sprite.
+
+    :param Player owner: The owner of this indicator bar.
+    :param arcade.SpriteList sprite_list: The sprite list used to draw the indicator
+    bar components.
+    :param Tuple[float, float] position: The initial position of the bar.
+    :param arcade.Color full_color: The color of the bar.
+    :param arcade.Color background_color: The background color of the bar.
+    :param int width: The width of the bar.
+    :param int height: The height of the bar.
+    :param int border_size: The size of the bar's border.
+    """
+
+    def __init__(
+        self,
+        owner: Player,
+        sprite_list: arcade.SpriteList,
+        position: Tuple[float, float] = (0, 0),
+        full_color: arcade.Color = arcade.color.GREEN,
+        background_color: arcade.Color = arcade.color.BLACK,
+        width: int = 100,
+        height: int = 4,
+        border_size: int = 4,
+    ) -> None:
+        # Store the reference to the owner and the sprite list
+        self.owner: Player = owner
+        self.sprite_list: arcade.SpriteList = sprite_list
+
+        # Set the needed size variables
+        self._box_width: int = width
+        self._box_height: int = height
+        self._half_box_width: int = self._box_width // 2
+        self._center_x: float = 0.0
+        self._center_y: float = 0.0
+        self._fullness: float = 0.0
+
+        # Create the boxes needed to represent the indicator bar
+        self._background_box: arcade.SpriteSolidColor = arcade.SpriteSolidColor(
+            self._box_width + border_size,
+            self._box_height + border_size,
+            background_color,
+        )
+        self._full_box: arcade.SpriteSolidColor = arcade.SpriteSolidColor(
+            self._box_width,
+            self._box_height,
+            full_color,
+        )
+        self.sprite_list.append(self._background_box)
+        self.sprite_list.append(self._full_box)
+
+        # Set the fullness and position of the bar
+        self.fullness: float = 1.0
+        self.position: Tuple[float, float] = position
+
+    def __repr__(self) -> str:
+        return f"<IndicatorBar (Owner={self.owner})>"
+
+    @property
+    def background_box(self) -> arcade.SpriteSolidColor:
+        """Returns the background box of the indicator bar."""
+        return self._background_box
+
+    @property
+    def full_box(self) -> arcade.SpriteSolidColor:
+        """Returns the full box of the indicator bar."""
+        return self._full_box
+
+    @property
+    def fullness(self) -> float:
+        """Returns the fullness of the bar."""
+        return self._fullness
+
+    @fullness.setter
+    def fullness(self, new_fullness: float) -> None:
+        """Sets the fullness of the bar."""
+        # Check if new_fullness if valid
+        if not (0.0 <= new_fullness <= 1.0):
+            raise ValueError(
+                f"Got {new_fullness}, but fullness must be between 0.0 and 1.0."
+            )
+
+        # Set the size of the bar
+        self._fullness = new_fullness
+        if new_fullness == 0.0:
+            # Set the full_box to not be visible since it is not full anymore
+            self.full_box.visible = False
+        else:
+            # Set the full_box to be visible incase it wasn't then update the bar
+            self.full_box.visible = True
+            self.full_box.width = self._box_width * new_fullness
+            self.full_box.left = self._center_x - (self._box_width // 2)
+
+    @property
+    def position(self) -> Tuple[float, float]:
+        """Returns the current position of the bar."""
+        return self._center_x, self._center_y
+
+    @position.setter
+    def position(self, new_position: Tuple[float, float]) -> None:
+        """Sets the new position of the bar."""
+        # Check if the position has changed. If so, change the bar's position
+        if new_position != self.position:
+            self._center_x, self._center_y = new_position
+            self.background_box.position = new_position
+            self.full_box.position = new_position
+
+            # Make sure full_box is to the left of the bar instead of the middle
+            self.full_box.left = self._center_x - (self._box_width // 2)
 
 class IndicatorBarMob:
     """
@@ -195,65 +331,66 @@ class Room:
     def __init__(self):
         # You may want many lists. Lists for coins, monsters, etc.
         self.wall_list = None
+        self.mob = None
 
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
 
-
 def setup_room_1():
     """
     Create and return room 1.
-    If your program gets large, you may want to separate this into different
-    files.
     """
     room = Room()
 
-    """ Set up the game and initialize the variables. """
     # Sprite lists
     room.wall_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
-    # This y loops a list of two, the coordinate 0, and just under the top of window
-    for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
-        # Loop for each box going across
-        for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7) or y==0:
-                # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-                wall.left = x
-                wall.bottom = y
-                room.wall_list.append(wall)
-
-    # Create left and right column of boxes
-    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
-        # Loop for each box going across
-        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    y = SCREEN_HEIGHT - SPRITE_SIZE
+    for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+        if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7) or y == 0:
+            wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall5.png"), SPRITE_SCALING/4)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png",
-                         SPRITE_SCALING)
-    wall.left = 7 * SPRITE_SIZE
-    wall.bottom = 5 * SPRITE_SIZE
-    room.wall_list.append(wall)
+    y = 0
+    for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+        wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
+        wall.left = x
+        wall.bottom = y
+        room.wall_list.append(wall)
 
-    # If you want coins or monsters in a level, then add that code here.
 
-    # Load the background image for this level.
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
+
+    # Create left and right column of boxes
+    x=0
+    for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+        wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
+        wall.left = x
+        wall.bottom = y
+        room.wall_list.append(wall)
+
+    x = SCREEN_WIDTH - SPRITE_SIZE
+    for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+        wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall4.png"), SPRITE_SCALING/4)
+        wall.left = x
+        wall.bottom = y
+        room.wall_list.append(wall)
+
+    # Set the background image for this room
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
-
 
 def setup_room_2():
     """
     Create and return room 2.
     """
     room = Room()
+
 
     """ Set up the game and initialize the variables. """
     # Sprite lists
@@ -267,7 +404,7 @@ def setup_room_2():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7): 
                 # Skip making a block 6 and 7 blocks up and down
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -278,17 +415,17 @@ def setup_room_2():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x==0:
                 # Skip making a block 4 and 5 blocks on the right side
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
             
 
-    wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall.jpg"), SPRITE_SCALING/4)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 4 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/tiles/planet.png")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -310,7 +447,7 @@ def setup_room_P1():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7) or y != 0:
                 # Skip making a block 6 and 7 blocks dawn
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -319,17 +456,13 @@ def setup_room_P1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_1.jpg")
 
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
     return room
 
 def setup_room_3():
@@ -350,7 +483,7 @@ def setup_room_3():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
                 if (x != SPRITE_SIZE * 6 and x != SPRITE_SIZE * 7):
                     # Skip making a block 6 and 7 blocks up and down
-                    wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
@@ -361,17 +494,23 @@ def setup_room_3():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5):
                 # Skip making a block 4 and 5 blocks up on the right and left side
-                wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
             
 
-    wall = arcade.Sprite(":resources:images/tiles/brickTextureWhite.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/tiles/planet.png")
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -393,7 +532,7 @@ def setup_room_B1():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y==0:
                 # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -402,16 +541,17 @@ def setup_room_B1():
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-                 wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                 wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                  wall.left = x
                  wall.bottom = y
                  room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_bonus.jpg"))
 
     return room
     
@@ -433,7 +573,7 @@ def setup_room_4():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3) or y==0:
                 # Skip making a block 2 and 3 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -444,16 +584,26 @@ def setup_room_4():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5) :
                     # Skip making a block 4 and 5 blocks on the right and left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 6 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 5 * SPRITE_SIZE
+    wall.bottom = 7 * SPRITE_SIZE
+    room.wall_list.append(wall)
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -473,7 +623,7 @@ def setup_room_B2():
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
@@ -484,16 +634,16 @@ def setup_room_B2():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x !=0:
                     # Skip making a block 4 and 5 blocks on the left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_bonus.jpg"))
 
     return room
 
@@ -515,7 +665,7 @@ def setup_room_5():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3):
                 # Skip making a block 2 and 3 blocks up and down
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -526,17 +676,12 @@ def setup_room_5():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x!=0:
                     # Skip making a block 6 and 7 blocks on the left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
-
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
     return room
 
 def setup_room_P2():
@@ -557,7 +702,7 @@ def setup_room_P2():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7)or y!=0:
                 # Skip making a block 6 and 7 blocks down
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -568,16 +713,12 @@ def setup_room_P2():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 6 and y!= SPRITE_SIZE * 7)or x==0:
                     # Skip making a block 6 and 7 blocks on the right side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
 
     return room
 
@@ -599,7 +740,7 @@ def setup_room_6():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 2 and x!= SPRITE_SIZE * 3)or y!=0:
                 # Skip making a block 2 and 3 blocks down
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -610,16 +751,16 @@ def setup_room_6():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x!=0:
                     # Skip making a block 4 and 5 blocks on the left side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -641,7 +782,7 @@ def setup_room_7():
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
             if (x != SPRITE_SIZE * 6 and x!= SPRITE_SIZE * 7) or y==0:
                 # Skip making a block 6 and 7 blocks up
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall3.jpg"), SPRITE_SCALING/4)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
@@ -652,16 +793,22 @@ def setup_room_7():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5):
                     # Skip making a block 4 and 5 blocks on the left and right side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall6.png"), SPRITE_SCALING/4)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+
+    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
+    wall.left = 7 * SPRITE_SIZE
+    wall.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(wall)
+
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
     return room
 
@@ -681,7 +828,7 @@ def setup_room_Boss():
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "Boss_wall.png"), SPRITE_SCALING/6)
             wall.left = x
             wall.bottom = y
             room.wall_list.append(wall)
@@ -692,16 +839,12 @@ def setup_room_Boss():
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
                 if (y != SPRITE_SIZE * 4 and y!= SPRITE_SIZE * 5)or x==0:
                     # Skip making a block 4 and 5 blocks on the right side
-                    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                    wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "Boss_wall.png"), SPRITE_SCALING/6)
                     wall.left = x
                     wall.bottom = y
                     room.wall_list.append(wall)
 
-    wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 6 * SPRITE_SIZE
-    room.wall_list.append(wall)
-    room.background = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+    room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "Boss_floor.png"))
 
     return room
 
@@ -721,29 +864,45 @@ class MyGame(arcade.Window):
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
 
+        #player part
+        self.epee_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
+        
+        self.player_list =  arcade.SpriteList()
+        
+        self.bar_list = arcade.SpriteList()
+        self.player_sprite = Player(self.bar_list)
+        self.enemy_sprite = MOB(self.bar_list)
+        self.enemy_timer = 0
+
+        # Track the current state of what key is pressed
+        self.left_pressed = False
+        self.right_pressed = False
+        self.up_pressed = False
+        self.down_pressed = False
+
+        #show the mouse cursor
+        self.set_mouse_visible(True)
+        # Load sounds. Sounds from kenney.nl
+        self.gun_sound = arcade.load_sound(":resources:sounds/hurt5.wav")
+        self.hit_sound = arcade.load_sound(":resources:sounds/hit5.wav")
+
+
+
         # Sprite lists
         self.current_room = 0
 
         # Set up the player
         self.rooms = None
-        self.player_sprite = None
-        self.player_list = None
         self.physics_engine = None
-
-        self.coin_list = None
-        self.score = 0
-        self.score_text = None
 
     def setup(self):
         """ Set up the game and initialize the variables. """
-        # Set up the player
-        self.player_sprite = arcade.Sprite(":resources:images/animated_characters/female_person/"
-                                           "femalePerson_idle.png", SPRITE_SCALING)
-        self.player_sprite.center_x = 100
-        self.player_sprite.center_y = 100
-        self.player_list = arcade.SpriteList()
+                # Setup player and enemy positions
+        self.player_sprite.position = self.width // 2, self.height // 4
         self.player_list.append(self.player_sprite)
-        self.coin_list = []
+        self.enemy_sprite.position = self.width // 2, self.height // 2
+
 
         # Our list of rooms
         self.rooms = []
@@ -785,18 +944,6 @@ class MyGame(arcade.Window):
         room = setup_room_Boss()
         self.rooms.append(room)
 
-        for i in range(len(self.rooms)):
-            c = arcade.SpriteList()
-            for n in range(10):            
-                coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
-
-            # Position the coin
-                coin.center_x = random.randrange(SCREEN_WIDTH)
-                coin.center_y = random.randrange(SCREEN_HEIGHT)
-                c.append(coin)
-            # Add the coin to the lists
-            self.coin_list.append(c)
-
         # Our starting room number
         self.current_room = 0
 
@@ -812,40 +959,135 @@ class MyGame(arcade.Window):
         self.clear()
 
         # Draw the background texture
-        arcade.draw_lrwh_rectangle_textured(0, 0,
-                                            SCREEN_WIDTH, SCREEN_HEIGHT, self.rooms[self.current_room].background)
+        arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.rooms[self.current_room].background)
 
         # Draw all the walls in this room
         self.rooms[self.current_room].wall_list.draw()
 
-        # If you have coins or monsters, then copy and modify the line
-        # above for each list.
+        # Draw all the sprites
+        self.player_sprite.draw()
+        self.epee_list.draw()
 
+        self.enemy_sprite.draw()
+        self.bullet_list.draw()
+
+        self.bar_list.draw()
         self.player_list.draw()
-        
-        self.coin_list[self.current_room].draw()
-        arcade.draw_text(f"Score: {self.score}", 10, 20, arcade.color.WHITE, 14)
+
+    def update_player_speed(self):
+        # Calculate speed based on the keys pressed
+
+        self.player_sprite.change_x = 0
+        self.player_sprite.change_y = 0
+
+        if self.up_pressed and not self.down_pressed:
+            self.player_sprite.change_y = MOVEMENT_SPEED
+
+        elif self.down_pressed and not self.up_pressed:
+            self.player_sprite.change_y = -MOVEMENT_SPEED
+
+        if self.left_pressed and not self.right_pressed:
+            self.player_sprite.change_x = -MOVEMENT_SPEED
+
+        elif self.right_pressed and not self.left_pressed:
+            self.player_sprite.change_x = MOVEMENT_SPEED
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        """
+        Called whenever the mouse button is clicked.
+        """
+        # Gunshot sound
+        arcade.play_sound(self.gun_sound)
+        # Create a bullet
+        epee = arcade.Sprite(":resources:gui_basic_assets/items/sword_gold.png", SPRITE_SCALING_EPEE)
+
+        #Coup en haut
+        if Dir_bullet_gauche == False and Dir_bullet_droite == False and Dir_bullet_bas == True and Dir_bullet_haut == False :
+            epee.angle = 180
+            epee.change_y = -EPEE_SPEED
+            epee.center_x = self.player_sprite.center_x
+            epee.top = self.player_sprite.bottom
+
+        #Coup en bas
+        elif Dir_bullet_gauche == False and Dir_bullet_droite == False and Dir_bullet_bas == False and Dir_bullet_haut == True :
+            epee.angle = 0
+            epee.change_y = EPEE_SPEED
+            epee.center_x = self.player_sprite.center_x
+            epee.bottom = self.player_sprite.top
+
+        #Coup à droite
+        elif Dir_bullet_gauche == False and Dir_bullet_droite == True and Dir_bullet_bas == False and Dir_bullet_haut == False :
+            epee.angle = -90
+            epee.change_x = EPEE_SPEED
+            epee.center_y = self.player_sprite.center_y
+            epee.left = self.player_sprite.right
+
+        #Coup à gauche
+        elif Dir_bullet_gauche == True and Dir_bullet_droite == False and Dir_bullet_bas == False and Dir_bullet_haut == False :
+            epee.angle = 90
+            epee.change_x = -EPEE_SPEED
+            epee.center_y = self.player_sprite.center_y
+            epee.right = self.player_sprite.left
+                
+        # Add the bullet to the appropriate lists
+        self.epee_list.append(epee)
+
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
 
-        if key == arcade.key.Z:
-            self.player_sprite.change_y = MOVEMENT_SPEED
-        elif key == arcade.key.S:
-            self.player_sprite.change_y = -MOVEMENT_SPEED
-        elif key == arcade.key.Q:
-            self.player_sprite.change_x = -MOVEMENT_SPEED
-        elif key == arcade.key.D:
-            self.player_sprite.change_x = MOVEMENT_SPEED
+        global Dir_bullet_droite, Dir_bullet_gauche, Dir_bullet_haut, Dir_bullet_bas
+
+        if key == arcade.key.Z :
+            self.up_pressed = True
+            self.update_player_speed()
+            Dir_bullet_droite = False
+            Dir_bullet_gauche = False
+            Dir_bullet_haut = True
+            Dir_bullet_bas = False
+
+        elif key == arcade.key.S :
+            self.down_pressed = True
+            self.update_player_speed()
+            Dir_bullet_droite = False
+            Dir_bullet_gauche = False
+            Dir_bullet_haut = False
+            Dir_bullet_bas = True
+
+        elif key == arcade.key.Q :
+            self.left_pressed = True
+            self.update_player_speed()
+            Dir_bullet_droite = False
+            Dir_bullet_gauche = True
+            Dir_bullet_haut = False
+            Dir_bullet_bas = False
+
+        elif key == arcade.key.D :
+            self.right_pressed = True
+            self.update_player_speed()
+            Dir_bullet_droite = True
+            Dir_bullet_gauche = False
+            Dir_bullet_haut = False
+            Dir_bullet_bas = False
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
 
-        if key == arcade.key.Z or key == arcade.key.S:
-            self.player_sprite.change_y = 0
-        elif key == arcade.key.Q or key == arcade.key.D:
-            self.player_sprite.change_x = 0
+        if key == arcade.key.Z :
+            self.up_pressed = False
+            self.update_player_speed()
 
+        elif key == arcade.key.S :
+            self.down_pressed = False
+            self.update_player_speed()
+
+        elif key == arcade.key.Q :
+            self.left_pressed = False
+            self.update_player_speed()
+
+        elif key == arcade.key.D :
+            self.right_pressed = False
+            self.update_player_speed()
     def on_update(self, delta_time):
         """ Movement and game logic """
 
@@ -853,15 +1095,96 @@ class MyGame(arcade.Window):
         # example though.)
         self.physics_engine.update()
 
-        #self.coin_list.update()
+        # Check if the player is dead. If so, exit the game
+        if self.player_sprite.health <= 0:
+            arcade.exit()
 
-        # Generate a list of all sprites that collided with the player.
-        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.coin_list[self.current_room])
+        if self.enemy_sprite.health <= 0:
+            arcade.exit()
 
-        # Loop through each colliding sprite, remove it, and add to the score.
-        for coin in hit_list:
-            coin.remove_from_sprite_lists()
-            self.score += 1
+        # Increase the enemy's timer
+        self.enemy_timer += delta_time
+
+        # Update the player's indicator bar position
+        self.player_sprite.indicator_bar.position = (
+            self.player_sprite.center_x,
+            self.player_sprite.center_y + INDICATOR_BAR_OFFSET,
+        )
+
+        self.enemy_sprite.indicator_bar.position = (
+            self.enemy_sprite.center_x,
+            self.enemy_sprite.center_y + INDICATOR_BAR_OFFSET,
+        )
+
+        # Call updates on bullet sprites
+        self.bullet_list.on_update(delta_time)
+
+        # Check if the enemy can attack. If so, shoot a bullet from the
+        # enemy towards the player
+        if self.enemy_timer >= ENEMY_ATTACK_COOLDOWN:
+            self.enemy_timer = 0
+
+            # Create the bullet
+            bullet = Bullet()
+
+            # Set the bullet's position
+            bullet.position = self.enemy_sprite.position
+
+            # Set the bullet's angle to face the player
+            diff_x = self.player_sprite.center_x - self.enemy_sprite.center_x
+            diff_y = self.player_sprite.center_y - self.enemy_sprite.center_y
+            angle = math.atan2(diff_y, diff_x)
+            angle_deg = math.degrees(angle)
+            if angle_deg < 0:
+                angle_deg += 360
+            bullet.angle = angle_deg
+
+            # Give the bullet a velocity towards the player
+            bullet.change_x = math.cos(angle) * BULLET_SPEED
+            bullet.change_y = math.sin(angle) * BULLET_SPEED
+
+            # Add the bullet to the bullet list
+            self.bullet_list.append(bullet)
+
+        # Loop through each bullet 
+        for existing_bullet in self.bullet_list:
+            # Check if the bullet has gone off-screen. If so, delete the bullet
+            if sprite_off_screen(existing_bullet):
+                existing_bullet.remove_from_sprite_lists()
+                continue
+
+            # Check if the bullet has hit the player
+            if arcade.check_for_collision(existing_bullet, self.player_sprite):
+                # Damage the player and remove the bullet
+                self.player_sprite.health -= BULLET_DAMAGE
+                existing_bullet.remove_from_sprite_lists()
+
+                # Set the player's indicator bar fullness
+                self.player_sprite.indicator_bar.fullness = (
+                    self.player_sprite.health / PLAYER_HEALTH
+                )
+
+        self.epee_list.update()
+        self.player_list.update()
+
+        # Loop through each bullet
+        for epee in self.epee_list:
+
+            if arcade.check_for_collision(epee, self.enemy_sprite):
+                # Damage the enemy and remove the epee
+                self.enemy_sprite.health -= BULLET_DAMAGE
+                epee.remove_from_sprite_lists()
+
+                # Set the player's indicator bar fullness
+                self.enemy_sprite.indicator_bar.fullness = (
+                    self.enemy_sprite.health / PLAYER_HEALTH
+                )
+
+                # Hit Sound
+                arcade.play_sound(self.hit_sound)
+
+            if len(self.epee_list) > 1 or (abs(epee.center_x - self.player_sprite.center_x) > 50) or (abs(epee.center_y - self.player_sprite.center_y) > 50):
+                epee.remove_from_sprite_lists()
 
         # Do some logic here to figure out what room we are in, and if we need to go
         # to a different room.
