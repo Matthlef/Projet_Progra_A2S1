@@ -35,12 +35,12 @@ BULLET_DAMAGE = 1
 ENEMY_ATTACK_COOLDOWN = 1
 
 INDICATOR_BAR_OFFSET = 32
-PLAYER_HEALTH = 5
+PLAYER_HEALTH = 10
 ENEMY_HEALTH = 3
 
-SCREEN_WIDTH = SPRITE_SIZE * 14
-SCREEN_HEIGHT = SPRITE_SIZE * 10
-SCREEN_TITLE = "Sprite Rooms Example"
+SCREEN_WIDTH = SPRITE_SIZE * 16
+SCREEN_HEIGHT = SPRITE_SIZE * 12
+SCREEN_TITLE = "Galactic strikeforce 2"
 
 Dir_bullet_droite = False
 Dir_bullet_gauche = False
@@ -332,6 +332,7 @@ class Room:
         # You may want many lists. Lists for coins, monsters, etc.
         self.wall_list = None
         self.mob = None
+        self.mob_list = arcade.SpriteList()
 
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
@@ -363,8 +364,6 @@ def setup_room_1():
         wall.bottom = y
         room.wall_list.append(wall)
 
-
-
     # Create left and right column of boxes
     x=0
     for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
@@ -382,10 +381,10 @@ def setup_room_1():
 
     # Set the background image for this room
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
-
+    
     return room
 
-def setup_room_2():
+def setup_room_2(self):
     """
     Create and return room 2.
     """
@@ -427,9 +426,15 @@ def setup_room_2():
     room.wall_list.append(wall)
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
 
+    for i in range(2): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
+
     return room
 
-def setup_room_P1():
+def setup_room_P1(self):
     """
     Create and return room P1.
     """
@@ -463,9 +468,15 @@ def setup_room_P1():
 
 
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
+    for i in range(4): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
+
     return room
 
-def setup_room_3():
+def setup_room_3(self):
     """
     Create and return room 3.
     """
@@ -511,6 +522,11 @@ def setup_room_3():
     room.wall_list.append(wall)
 
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
+    for i in range(2): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
 
     return room
 
@@ -555,7 +571,7 @@ def setup_room_B1():
 
     return room
     
-def setup_room_4():
+def setup_room_4(self):
     """
     Create and return room 4.
     """
@@ -604,6 +620,12 @@ def setup_room_4():
     wall.bottom = 7 * SPRITE_SIZE
     room.wall_list.append(wall)
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
+    
+    for i in range(2): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
 
     return room
 
@@ -647,7 +669,7 @@ def setup_room_B2():
 
     return room
 
-def setup_room_5():
+def setup_room_5(self):
     """
     Create and return room 5.
     """
@@ -682,9 +704,16 @@ def setup_room_5():
                     room.wall_list.append(wall)
 
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
+
+    for i in range(2): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
+
     return room
 
-def setup_room_P2():
+def setup_room_P2(self):
     """
     Create and return room P2.
     """
@@ -719,10 +748,16 @@ def setup_room_P2():
                     room.wall_list.append(wall)
 
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
+    
+    for i in range(4): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
 
     return room
 
-def setup_room_6():
+def setup_room_6(self):
     """
     Create and return room 6.
     """
@@ -761,10 +796,16 @@ def setup_room_6():
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
+    
+    for i in range(2): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
 
     return room
 
-def setup_room_7():
+def setup_room_7(self):
     """
     Create and return room 7.
     """
@@ -809,10 +850,16 @@ def setup_room_7():
     room.wall_list.append(wall)
 
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
+    
+    for i in range(2): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
 
     return room
 
-def setup_room_Boss():
+def setup_room_Boss(self):
     """
     Create and return room Boss.
     """
@@ -845,6 +892,12 @@ def setup_room_Boss():
                     room.wall_list.append(wall)
 
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "Boss_floor.png"))
+    
+    for i in range(6): 
+        enemy = MOB(self.bar_list)
+        enemy.center_x = random.randrange(SCREEN_WIDTH)
+        enemy.center_y = random.randrange(SCREEN_HEIGHT)
+        room.mob_list.append(enemy)
 
     return room
 
@@ -872,7 +925,6 @@ class MyGame(arcade.Window):
         
         self.bar_list = arcade.SpriteList()
         self.player_sprite = Player(self.bar_list)
-        self.enemy_sprite = MOB(self.bar_list)
         self.enemy_timer = 0
 
         # Track the current state of what key is pressed
@@ -901,8 +953,6 @@ class MyGame(arcade.Window):
                 # Setup player and enemy positions
         self.player_sprite.position = self.width // 2, self.height // 4
         self.player_list.append(self.player_sprite)
-        self.enemy_sprite.position = self.width // 2, self.height // 2
-
 
         # Our list of rooms
         self.rooms = []
@@ -911,37 +961,37 @@ class MyGame(arcade.Window):
         room = setup_room_1()
         self.rooms.append(room)
 
-        room = setup_room_2()
+        room = setup_room_2(self)
         self.rooms.append(room)
 
-        room = setup_room_P1()
+        room = setup_room_P1(self)
         self.rooms.append(room)
 
-        room = setup_room_3()
+        room = setup_room_3(self)
         self.rooms.append(room)
 
         room = setup_room_B1()
         self.rooms.append(room)
         
-        room = setup_room_4()
+        room = setup_room_4(self)
         self.rooms.append(room)
 
         room = setup_room_B2()
         self.rooms.append(room)
 
-        room = setup_room_5()
+        room = setup_room_5(self)
         self.rooms.append(room)
 
-        room = setup_room_P2()
+        room = setup_room_P2(self)
         self.rooms.append(room)
 
-        room = setup_room_6()
+        room = setup_room_6(self)
         self.rooms.append(room)
 
-        room = setup_room_7()
+        room = setup_room_7(self)
         self.rooms.append(room)
 
-        room = setup_room_Boss()
+        room = setup_room_Boss(self)
         self.rooms.append(room)
 
         # Our starting room number
@@ -963,12 +1013,12 @@ class MyGame(arcade.Window):
 
         # Draw all the walls in this room
         self.rooms[self.current_room].wall_list.draw()
+        self.rooms[self.current_room].mob_list.draw()
 
         # Draw all the sprites
         self.player_sprite.draw()
         self.epee_list.draw()
 
-        self.enemy_sprite.draw()
         self.bullet_list.draw()
 
         self.bar_list.draw()
@@ -1098,9 +1148,11 @@ class MyGame(arcade.Window):
         # Check if the player is dead. If so, exit the game
         if self.player_sprite.health <= 0:
             arcade.exit()
-
-        if self.enemy_sprite.health <= 0:
-            arcade.exit()
+        
+        for i in self.rooms[self.current_room].mob_list:
+            if i.health <= 0 :
+                i.remove_from_sprite_lists()
+                i.indicator_bar.position = -500,-500
 
         # Increase the enemy's timer
         self.enemy_timer += delta_time
@@ -1111,10 +1163,8 @@ class MyGame(arcade.Window):
             self.player_sprite.center_y + INDICATOR_BAR_OFFSET,
         )
 
-        self.enemy_sprite.indicator_bar.position = (
-            self.enemy_sprite.center_x,
-            self.enemy_sprite.center_y + INDICATOR_BAR_OFFSET,
-        )
+        for i in self.rooms[self.current_room].mob_list:
+            i.indicator_bar.position = (i.center_x, i.center_y + INDICATOR_BAR_OFFSET)
 
         # Call updates on bullet sprites
         self.bullet_list.on_update(delta_time)
@@ -1126,62 +1176,63 @@ class MyGame(arcade.Window):
 
             # Create the bullet
             bullet = Bullet()
-
+            for i in self.rooms[self.current_room].mob_list:
+                bullet = Bullet()
             # Set the bullet's position
-            bullet.position = self.enemy_sprite.position
+                bullet.position = i.position
 
             # Set the bullet's angle to face the player
-            diff_x = self.player_sprite.center_x - self.enemy_sprite.center_x
-            diff_y = self.player_sprite.center_y - self.enemy_sprite.center_y
-            angle = math.atan2(diff_y, diff_x)
-            angle_deg = math.degrees(angle)
-            if angle_deg < 0:
-                angle_deg += 360
-            bullet.angle = angle_deg
+                diff_x = self.player_sprite.center_x - i.center_x
+                diff_y = self.player_sprite.center_y - i.center_y
+                angle = math.atan2(diff_y, diff_x)
+                angle_deg = math.degrees(angle)
+                if angle_deg < 0:
+                    angle_deg += 360
+                bullet.angle = angle_deg
 
             # Give the bullet a velocity towards the player
-            bullet.change_x = math.cos(angle) * BULLET_SPEED
-            bullet.change_y = math.sin(angle) * BULLET_SPEED
+                bullet.change_x = math.cos(angle) * BULLET_SPEED
+                bullet.change_y = math.sin(angle) * BULLET_SPEED
 
             # Add the bullet to the bullet list
-            self.bullet_list.append(bullet)
+                self.bullet_list.append(bullet)
 
         # Loop through each bullet 
-        for existing_bullet in self.bullet_list:
+            for existing_bullet in self.bullet_list:
             # Check if the bullet has gone off-screen. If so, delete the bullet
-            if sprite_off_screen(existing_bullet):
-                existing_bullet.remove_from_sprite_lists()
-                continue
+                if sprite_off_screen(existing_bullet):
+                    existing_bullet.remove_from_sprite_lists()
+                    continue
 
             # Check if the bullet has hit the player
-            if arcade.check_for_collision(existing_bullet, self.player_sprite):
+                if arcade.check_for_collision(existing_bullet, self.player_sprite):
                 # Damage the player and remove the bullet
-                self.player_sprite.health -= BULLET_DAMAGE
-                existing_bullet.remove_from_sprite_lists()
+                    self.player_sprite.health -= BULLET_DAMAGE
+                    existing_bullet.remove_from_sprite_lists()
 
                 # Set the player's indicator bar fullness
-                self.player_sprite.indicator_bar.fullness = (
-                    self.player_sprite.health / PLAYER_HEALTH
-                )
+                    self.player_sprite.indicator_bar.fullness = (
+                        self.player_sprite.health / PLAYER_HEALTH
+                    )
 
         self.epee_list.update()
         self.player_list.update()
 
         # Loop through each bullet
         for epee in self.epee_list:
-
-            if arcade.check_for_collision(epee, self.enemy_sprite):
+            for i in self.rooms[self.current_room].mob_list:
+                if arcade.check_for_collision(epee, i):
                 # Damage the enemy and remove the epee
-                self.enemy_sprite.health -= BULLET_DAMAGE
-                epee.remove_from_sprite_lists()
+                    i.health -= BULLET_DAMAGE
+                    epee.remove_from_sprite_lists()
 
                 # Set the player's indicator bar fullness
-                self.enemy_sprite.indicator_bar.fullness = (
-                    self.enemy_sprite.health / PLAYER_HEALTH
-                )
+                    i.indicator_bar.fullness = (
+                        i.health / ENEMY_HEALTH
+                    )
 
                 # Hit Sound
-                arcade.play_sound(self.hit_sound)
+                    arcade.play_sound(self.hit_sound)
 
             if len(self.epee_list) > 1 or (abs(epee.center_x - self.player_sprite.center_x) > 50) or (abs(epee.center_y - self.player_sprite.center_y) > 50):
                 epee.remove_from_sprite_lists()
