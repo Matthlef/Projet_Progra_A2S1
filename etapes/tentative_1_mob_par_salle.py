@@ -23,19 +23,19 @@ SPRITE_NATIVE_SIZE = 128
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
 SPRITE_SCALING_PLAYER = 0.3
+SPRITE_SCALING_ENEMY = 0.5
 MOVEMENT_SPEED = 4
+
+SPRITE_SCALING_BULLET = 1
+BULLET_SPEED = 150
 SPRITE_SCALING_EPEE = 0.7
 EPEE_SPEED = 8
 BULLET_DAMAGE = 1
+ENEMY_ATTACK_COOLDOWN = 1
 
 INDICATOR_BAR_OFFSET = 32
 PLAYER_HEALTH = 5
-
-SPRITE_SCALING_ENEMY = 0.5
-SPRITE_SCALING_BULLET = 1
-BULLET_SPEED = 150
-BULLET_DAMAGE = 1
-ENEMY_ATTACK_COOLDOWN = 1
+ENEMY_HEALTH = 3
 
 SCREEN_WIDTH = SPRITE_SIZE * 14
 SCREEN_HEIGHT = SPRITE_SIZE * 10
@@ -74,6 +74,18 @@ class Player(arcade.Sprite):
         """ Move the player """
         self.center_x += self.change_x
         self.center_y += self.change_y
+
+class MOB(arcade.Sprite):
+    def __init__(self, bar_list: arcade.SpriteList) -> None:
+        super().__init__(
+            filename=image_zombie_idle,
+            scale= SPRITE_SCALING_ENEMY
+        )
+        self.indicator_bar: IndicatorBarMob = IndicatorBarMob(
+            self, bar_list, (self.center_x, self.center_y)
+        )
+        self.health: int = ENEMY_HEALTH
+
 
 class IndicatorBar:
     """
@@ -186,6 +198,119 @@ class IndicatorBar:
             # Make sure full_box is to the left of the bar instead of the middle
             self.full_box.left = self._center_x - (self._box_width // 2)
 
+class IndicatorBarMob:
+    """
+    Represents a bar which can display information about a sprite.
+
+    :param Player owner: The owner of this indicator bar.
+    :param arcade.SpriteList sprite_list: The sprite list used to draw the indicator
+    bar components.
+    :param Tuple[float, float] position: The initial position of the bar.
+    :param arcade.Color full_color: The color of the bar.
+    :param arcade.Color background_color: The background color of the bar.
+    :param int width: The width of the bar.
+    :param int height: The height of the bar.
+    :param int border_size: The size of the bar's border.
+    """
+
+    def __init__(
+        self,
+        owner: MOB,
+        sprite_list: arcade.SpriteList,
+        position: Tuple[float, float] = (0, 0),
+        full_color: arcade.Color = arcade.color.GREEN,
+        background_color: arcade.Color = arcade.color.BLACK,
+        width: int = 100,
+        height: int = 4,
+        border_size: int = 4,
+    ) -> None:
+        # Store the reference to the owner and the sprite list
+        self.owner: MOB = owner
+        self.sprite_list: arcade.SpriteList = sprite_list
+
+        # Set the needed size variables
+        self._box_width: int = width
+        self._box_height: int = height
+        self._half_box_width: int = self._box_width // 2
+        self._center_x: float = 0.0
+        self._center_y: float = 0.0
+        self._fullness: float = 0.0
+
+        # Create the boxes needed to represent the indicator bar
+        self._background_box: arcade.SpriteSolidColor = arcade.SpriteSolidColor(
+            self._box_width + border_size,
+            self._box_height + border_size,
+            background_color,
+        )
+        self._full_box: arcade.SpriteSolidColor = arcade.SpriteSolidColor(
+            self._box_width,
+            self._box_height,
+            full_color,
+        )
+        self.sprite_list.append(self._background_box)
+        self.sprite_list.append(self._full_box)
+
+        # Set the fullness and position of the bar
+        self.fullness: float = 1.0
+        self.position: Tuple[float, float] = position
+
+    def __repr__(self) -> str:
+        return f"<IndicatorBar (Owner={self.owner})>"
+
+    @property
+    def background_box(self) -> arcade.SpriteSolidColor:
+        """Returns the background box of the indicator bar."""
+        return self._background_box
+
+    @property
+    def full_box(self) -> arcade.SpriteSolidColor:
+        """Returns the full box of the indicator bar."""
+        return self._full_box
+
+    @property
+    def fullness(self) -> float:
+        """Returns the fullness of the bar."""
+        return self._fullness
+
+    @fullness.setter
+    def fullness(self, new_fullness: float) -> None:
+        """Sets the fullness of the bar."""
+        # Check if new_fullness if valid
+        if not (0.0 <= new_fullness <= 1.0):
+            raise ValueError(
+                f"Got {new_fullness}, but fullness must be between 0.0 and 1.0."
+            )
+
+        # Set the size of the bar
+        self._fullness = new_fullness
+        if new_fullness == 0.0:
+            # Set the full_box to not be visible since it is not full anymore
+            self.full_box.visible = False
+        else:
+            # Set the full_box to be visible incase it wasn't then update the bar
+            self.full_box.visible = True
+            self.full_box.width = self._box_width * new_fullness
+            self.full_box.left = self._center_x - (self._box_width // 2)
+
+    @property
+    def position(self) -> Tuple[float, float]:
+        """Returns the current position of the bar."""
+        return self._center_x, self._center_y
+
+    @position.setter
+    def position(self, new_position: Tuple[float, float]) -> None:
+        """Sets the new position of the bar."""
+        # Check if the position has changed. If so, change the bar's position
+        if new_position != self.position:
+            self._center_x, self._center_y = new_position
+            self.background_box.position = new_position
+            self.full_box.position = new_position
+
+            # Make sure full_box is to the left of the bar instead of the middle
+            self.full_box.left = self._center_x - (self._box_width // 2)
+
+
+
 
 class Room:
     """
@@ -201,7 +326,7 @@ class Room:
         self.background = None
 
 
-def setup_room_1():
+def setup_room_1(self):
     """
     Create and return room 1.
     """
@@ -246,12 +371,12 @@ def setup_room_1():
 
     # Set the background image for this room
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
-
+    self.enemy_sprite.position = self.width // 2, self.height // 2
     return room
 
 
 
-def setup_room_2():
+def setup_room_2(self):
     """
     Create and return room 2.
     """
@@ -291,6 +416,7 @@ def setup_room_2():
     wall.bottom = 4 * SPRITE_SIZE
     room.wall_list.append(wall)
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor.jpg"))
+
 
     return room
 
@@ -736,6 +862,8 @@ class MyGame(arcade.Window):
         
         self.bar_list = arcade.SpriteList()
         self.player_sprite = Player(self.bar_list)
+        self.enemy_sprite = MOB(self.bar_list)
+        self.enemy_timer = 0
 
         # Track the current state of what key is pressed
         self.left_pressed = False
@@ -768,10 +896,10 @@ class MyGame(arcade.Window):
         self.rooms = []
 
         # Create the rooms. Extend the pattern for each room.
-        room = setup_room_1()
+        room = setup_room_1(self)
         self.rooms.append(room)
 
-        room = setup_room_2()
+        room = setup_room_2(self)
         self.rooms.append(room)
 
         room = setup_room_P1()
@@ -827,6 +955,8 @@ class MyGame(arcade.Window):
         # Draw all the sprites
         self.player_sprite.draw()
         self.epee_list.draw()
+
+        self.enemy_sprite.draw()
 
         self.bar_list.draw()
         self.player_list.draw()
