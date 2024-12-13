@@ -1,12 +1,3 @@
-"""
-Sprite move between different rooms.
-
-Artwork from https://kenney.nl
-
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.sprite_rooms
-"""
-
 import arcade
 import os
 import math
@@ -1553,9 +1544,6 @@ if __name__ == "__main__":
     window = arcade.Window(title="Arcade Music Control Demo")
     window.show_view(MyView(window))
     arcade.run()
-
-
-
 
 if __name__ == "__main__":
     main()
