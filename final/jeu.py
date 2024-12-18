@@ -3,6 +3,7 @@ import os
 import math
 from typing import Tuple
 import random
+import arcade.gui
 
 from arcade.resources import (
     image_female_person_idle,
