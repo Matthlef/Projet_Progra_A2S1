@@ -96,7 +96,6 @@ class Bullet(arcade.Sprite):
 class IndicatorBar:
     """
     Represents a bar which can display information about a sprite.
-
     :param Player owner: The owner of this indicator bar.
     :param arcade.SpriteList sprite_list: The sprite list used to draw the indicator
     bar components.
@@ -207,7 +206,6 @@ class IndicatorBar:
 class IndicatorBarMob:
     """
     Represents a bar which can display information about a sprite.
-
     :param Player owner: The owner of this indicator bar.
     :param arcade.SpriteList sprite_list: The sprite list used to draw the indicator
     bar components.
@@ -382,7 +380,6 @@ def setup_room_2(self):
     """
     room = Room()
 
-
     """ Set up the game and initialize the variables. """
     # Sprite lists
     room.wall_list = arcade.SpriteList()
@@ -411,7 +408,6 @@ def setup_room_2(self):
                 wall.bottom = y
                 room.wall_list.append(wall)
             
-
     wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall.jpg"), SPRITE_SCALING/4)
     wall.left = 7 * SPRITE_SIZE
     wall.bottom = 4 * SPRITE_SIZE
@@ -423,7 +419,6 @@ def setup_room_2(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_P1(self):
@@ -458,14 +453,12 @@ def setup_room_P1(self):
                 wall.bottom = y
                 room.wall_list.append(wall)
 
-
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_trap.jpg"))
     for i in range(4): 
         enemy = MOB(self.bar_list)
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_3(self):
@@ -501,7 +494,6 @@ def setup_room_3(self):
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
-            
 
     wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 5 * SPRITE_SIZE
@@ -519,7 +511,6 @@ def setup_room_3(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_B1():
@@ -554,13 +545,11 @@ def setup_room_B1():
                  wall.bottom = y
                  room.wall_list.append(wall)
 
-
     wall = arcade.Sprite(os.path.join(os.path.dirname(__file__), "space_station_wall2.jpg"), SPRITE_SCALING/3)
     wall.left = 7 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_bonus.jpg"))
-
     return room
     
 def setup_room_4(self):
@@ -618,7 +607,6 @@ def setup_room_4(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_B2():
@@ -658,7 +646,6 @@ def setup_room_B2():
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
     room.background = arcade.load_texture(os.path.join(os.path.dirname(__file__), "space_station_floor_bonus.jpg"))
-
     return room
 
 def setup_room_5(self):
@@ -702,7 +689,6 @@ def setup_room_5(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_P2(self):
@@ -746,7 +732,6 @@ def setup_room_P2(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_6(self):
@@ -794,7 +779,6 @@ def setup_room_6(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_7(self):
@@ -848,7 +832,6 @@ def setup_room_7(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 def setup_room_Boss(self):
@@ -890,7 +873,6 @@ def setup_room_Boss(self):
         enemy.center_x = random.randrange(SCREEN_WIDTH)
         enemy.center_y = random.randrange(SCREEN_HEIGHT)
         room.mob_list.append(enemy)
-
     return room
 
 class MyGame(arcade.Window):
@@ -996,7 +978,6 @@ class MyGame(arcade.Window):
         """
         Render the screen.
         """
-
         # This command has to happen before we start drawing
         self.clear()
 
@@ -1114,7 +1095,6 @@ class MyGame(arcade.Window):
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
-
         if key == arcade.key.Z :
             self.up_pressed = False
             self.update_player_speed()
@@ -1130,6 +1110,7 @@ class MyGame(arcade.Window):
         elif key == arcade.key.D :
             self.right_pressed = False
             self.update_player_speed()
+
     def on_update(self, delta_time):
         """ Movement and game logic """
 
@@ -1356,8 +1337,7 @@ class MyView(arcade.View):
 
         self.media_player = None
         self.paused = True
-        self.songs = [":resources:music/funkyrobot.mp3",
-                      ":resources:music/1918.mp3"]
+        self.songs = [":resources:music/funkyrobot.mp3",":resources:music/1918.mp3"]
         self.cur_song_index = 0
 
         self.my_music = arcade.load_sound(self.songs[self.cur_song_index])
@@ -1368,12 +1348,9 @@ class MyView(arcade.View):
         box = arcade.gui.UIBoxLayout(vertical=False)
 
         # --- Start button
-        normal_texture = arcade.load_texture(":resources:onscreen_controls/flat_dark/"
-                                             "sound_off.png")
-        hover_texture = arcade.load_texture(":resources:onscreen_controls/shaded_dark/"
-                                            "sound_off.png")
-        press_texture = arcade.load_texture(":resources:onscreen_controls/shaded_dark/"
-                                            "sound_off.png")
+        normal_texture = arcade.load_texture(":resources:onscreen_controls/flat_dark/sound_off.png")
+        hover_texture = arcade.load_texture(":resources:onscreen_controls/shaded_dark/sound_off.png")
+        press_texture = arcade.load_texture(":resources:onscreen_controls/shaded_dark/sound_off.png")
 
         # Create our button
         self.start_button = arcade.gui.UITextureButton(
@@ -1538,7 +1515,6 @@ class MyView(arcade.View):
         # This unregisters the manager's UI handlers,
         # Handlers respond to GUI button clicks, etc.
         self.ui_manager.disable()
-
 
 if __name__ == "__main__":
     window = arcade.Window(title="Arcade Music Control Demo")
